@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，作用就是对sql进行分类化管理,理解为sql隔离
+ 注意：使用mapper代理方法开发，namespace有特殊重要的作用
+ -->
+<mapper namespace="com.svc.org.mapper.UserMapper">
+    <!-- 在映射文件中配置很多sql语句 -->
+    <!--需求:通过id查询用户表的记录 -->
+    <!-- 通过select执行数据库查询
+     id:标识映射文件中的sql，称为statement的id
+     将sql语句封装到mappedStatement对象中，所以将id称为statement的id
+     parameterType:指定输入参数的类型
+     #{}标示一个占位符,
+     #{value}其中value表示接收输入参数的名称，如果输入参数是简单类型，那么#{}中的值可以任意。
+
+     resultType：指定sql输出结果的映射的java对象类型，select指定resultType表示将单条记录映射成java对象
+     -->
+    <select id="findUserById" parameterType="int" resultType="com.svc.org.po.User">
+        SELECT * FROM  demo101.user  WHERE id=#{value}
+    </select>
+
+    <!-- 根据用户名称模糊查询用户信息，可能返回多条
+	resultType：指定就是单条记录所映射的java对象类型
+	${}:表示拼接sql串，将接收到参数的内容不加任何修饰拼接在sql中。
+	使用${}拼接sql，引起 sql注入
+	${value}：接收输入参数的内容，如果传入类型是简单类型，${}中只能使用value
+	 -->
+    <select id="findUserByName" parameterType="java.lang.String" resultType="com.svc.org.po.User">
+        SELECT * FROM demotest.user WHERE username LIKE '%${value}%'
+    </select>
+
+    <!--插入数据-->
+    <insert id="insertUser" parameterType="com.svc.org.po.User">
+        <selectKey keyProperty="user_id" order="AFTER" resultType="java.lang.Integer">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (username,email,password)value (#{username},#{email},#{password})
+    </insert>
+
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        delete from user where user_id = #{UserID}
+    </delete>
+
+    <update id="updateUser" parameterType="com.svc.org.po.User">
+        update user set username = #{username},email = #{email}
+        where user_id = #{user_id}
+    </update>
+
+    <select id="findUserList" parameterType="com.svc.org.po.UserQueryVo"
+            resultType="com.svc.org.po.UserCustom">
+        SELECT * FROM demo101.user WHERE demo101.user.email=#{userCustom.email} AND demo101.user.username LIKE '%${userCustom.username}%'
+    </select>
+
+    <!-- 使用resultMap进行输出映射
+        resultMap：指定定义的resultMap的id，如果这个resultMap在其它的mapper文件，前边需要加namespace
+        -->
+    <select id="findUserByIdResultMap" parameterType="int" resultMap="userResultMap">
+        SELECT id id_,username username_ FROM demo101.user WHERE sex=#{value}
+    </select>
+
+    <!-- 定义resultMap
+	将SELECT id id_,username username_ FROM USER 和User类中的属性作一个映射关系
+
+	type：resultMap最终映射的java对象类型,可以使用别名
+	id：对resultMap的唯一标识
+	 -->
+    <resultMap type="com.svc.org.po.User" id="userResultMap">
+        <!-- id表示查询结果集中唯一标识
+        column：查询出来的列名
+        property：type指定的pojo类型中的属性名
+        最终resultMap对column和property作一个映射关系 （对应关系）
+        -->
+        <id column="id_" property="id"/>
+        <!--
+        result：对普通名映射定义
+        column：查询出来的列名
+        property：type指定的pojo类型中的属性名
+        最终resultMap对column和property作一个映射关系 （对应关系）
+         -->
+        <result column="username_" property="username"/>
+
+    </resultMap>
+
+    <select id="findOrdersAndOrderDetailResultMap" parameterType="int" resultMap="ordersAndOrderDetailResultMap">
+      select
+      demo101.orders.*,
+      demo101.user.username,
+      demo101.user.sex,
+      demo101.user.email,
+      demo101.user.address,
+      demo101.user.create_time,
+      demo101.orderdetail.id orderdetail_id,
+      demo101.orderdetail.items_id,
+      demo101.orderdetail.items_num,
+      demo101.orderdetail.orders_id
+      from
+      demo101.orders,
+      demo101.user,
+      demo101.orderdetail
+      where
+      demo101.orders.user_id = #{userId} and demo101.orders.id = demo101.orderdetail.orders_id
+    </select>
+
+    <resultMap id="ordersAndOrderDetailResultMap" type="com.svc.org.po.Orders" extends="OrdersAndUserResultMap">
+        <collection property="orderDetails" ofType="com.svc.org.po.OrderDetail">
+            <id column="orderdetail_id" property="id"/>
+            <result column="items_id" property="itemsId"/>
+            <result column="items_num" property="itemsNum"/>
+            <result column="orders_id" property="ordersId"/>
+        </collection>
+    </resultMap>
+
+    <select id="findOrdersAndUserResultMap" parameterType="int" resultMap="OrdersAndUserResultMap">
+        select demo101.orders.* ,
+        demo101.user.username,
+        demo101.user.sex,
+        demo101.user.email,
+        demo101.user.address,
+        demo101.user.create_time
+        from
+        demo101.orders,
+        demo101.user
+        where
+        demo101.orders.user_id = #{userId}
+    </select>
+
+    <resultMap id="OrdersAndUserResultMap" type="com.svc.org.po.Orders">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="number" property="number"/>
+        <result column="createtime" property="createtime"/>
+        <result column="note" property="note"/>
+
+        <association property="user" javaType="com.svc.org.po.User">
+            <id column="user_id" property="id"/>
+            <result column="username" property="username"/>
+            <result column="sex" property="sex"/>
+            <result column="email" property="email"/>
+            <result column="address" property="address"/>
+            <result column="create_time" property="create_time"/>
+        </association>
+    </resultMap>
+
+    <!-- 查询用户及购买的商品信息，使用resultmap -->
+    <select id="findUserAndItemsResultMap" parameterType="int" resultMap="UserAndItemsResultMap">
+   SELECT
+      demo101.orders.*,
+      demo101.user.username,
+      demo101.user.sex,
+      demo101.user.address,
+      demo101.orderdetail.id orderdetail_id,
+      demo101.orderdetail.items_id,
+      demo101.orderdetail.items_num,
+      demo101.orderdetail.orders_id,
+      demo101.items.name items_name,
+      demo101.items.detail items_detail,
+      demo101.items.price items_price
+    FROM
+      demo101.orders,
+      demo101.user,
+      demo101.orderdetail,
+      demo101.items
+    WHERE demo101.orders.user_id = #{userId} AND demo101.orderdetail.orders_id=demo101.orders.id AND demo101.orderdetail.items_id = demo101.items.id
+</select>
+
+    <!-- 查询用户及购买的商品 -->
+    <resultMap type="com.svc.org.po.User" id="UserAndItemsResultMap">
+        <!-- 用户信息 -->
+        <id column="user_id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="sex" property="sex"/>
+        <result column="address" property="address"/>
+
+        <!-- 订单信息
+        一个用户对应多个订单，使用collection映射
+         -->
+        <collection property="ordersList" ofType="com.svc.org.po.Orders">
+            <id column="id" property="id"/>
+            <result column="user_id" property="userId"/>
+            <result column="number" property="number"/>
+            <result column="createtime" property="createtime"/>
+            <result column="note" property="note"/>
+
+            <!-- 订单明细
+             一个订单包括 多个明细
+             -->
+            <collection property="orderDetails" ofType="com.svc.org.po.OrderDetail">
+                <id column="orderdetail_id" property="id"/>
+                <result column="items_id" property="itemsId"/>
+                <result column="items_num" property="itemsNum"/>
+                <result column="orders_id" property="ordersId"/>
+
+                <!-- 商品信息
+                 一个订单明细对应一个商品
+                 -->
+                <association property="items" javaType="com.svc.org.po.Item">
+                    <id column="items_id" property="id"/>
+                    <result column="items_name" property="name"/>
+                    <result column="items_detail" property="detail"/>
+                    <result column="items_price" property="pic"/>
+                </association>
+
+            </collection>
+
+        </collection>
+    </resultMap>
+</mapper>
