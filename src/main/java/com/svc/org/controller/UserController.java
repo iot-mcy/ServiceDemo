@@ -48,14 +48,15 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/get/{username}")
-    public List<UserCustom> getUser2(@PathVariable("username") String username){
+    public List<UserCustom> getUser2(@PathVariable("username") String username) {
 
         //创建包装对象，设置查询条件
         UserQueryVo userQueryVo = new UserQueryVo();
         UserCustom userCustom = new UserCustom();
         //由于这里使用动态sql，如果不设置某个值，条件不会拼接在sql中
-        userCustom.setEmail("meng@id.com");
-        userCustom.setUsername("meng");
+//        userCustom.setEmail("meng@id.com");
+//        userCustom.setUsername(username);
+        userCustom.setId(1000);
         userQueryVo.setUserCustom(userCustom);
 
         List<UserCustom> userList = new ArrayList<UserCustom>();
@@ -67,5 +68,25 @@ public class UserController {
         return userList;
     }
 
-    
+    @ResponseBody
+    @RequestMapping(value = "/getUserByID/{userID}")
+    public ResponseEntity<User> getUserById(@PathVariable("userID") int userId) {
+        User user = null;
+        try {
+            user = userService.findUserById(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ResponseEntity<User> responseEntity = new ResponseEntity<User>();
+        if (user == null) {
+            responseEntity.setStatus(-1);
+            responseEntity.setMsg("失败");
+        } else {
+            responseEntity.setStatus(0);
+            responseEntity.setMsg("成功");
+            responseEntity.setData(user);
+        }
+        return responseEntity;
+    }
+
 }

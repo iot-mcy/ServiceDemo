@@ -50,7 +50,8 @@
 
     <select id="findUserList" parameterType="com.svc.org.po.UserQueryVo"
             resultType="com.svc.org.po.UserCustom">
-        SELECT * FROM demo101.user WHERE demo101.user.email=#{userCustom.email} AND demo101.user.username LIKE '%${userCustom.username}%'
+        select * from  demo101.user where demo101.user.id = #{userCustom.id}
+--         SELECT * FROM demo101.user WHERE demo101.user.email=#{userCustom.email} AND demo101.user.username LIKE '%${userCustom.username}%'
     </select>
 
     <!-- 使用resultMap进行输出映射
