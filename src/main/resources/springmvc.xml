@@ -28,11 +28,13 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
-    <!-- 注解的映射器 -->
-    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+    <!--<bean class="com.svc.org.exception.CustomExceptionResolver"/>-->
 
-    <!-- 注解的适配器 -->
-    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
+    <!--&lt;!&ndash; 注解的映射器 &ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>-->
+
+    <!--&lt;!&ndash; 注解的适配器 &ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>-->
 
     <!-- 会自动注册RequestMappingHandlerMapping与RequestMappingHandlerAdapter两个Bean，
 		这是SpringMVC为@Controllers分发请求所必需的，并提供了数据绑定支持、@NumberFormatAnnotation支持、 @DateTimeFormat支持、@Valid支持、读写XML的支持和读写JSON的支持等功能。 -->

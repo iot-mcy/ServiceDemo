@@ -5,6 +5,9 @@ public class ResponseEntity<T> {
     private T data;
     private String msg;
 
+    public ResponseEntity() {
+    }
+
     public int getStatus() {
         return status;
     }
