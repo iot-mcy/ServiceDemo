@@ -21,6 +21,10 @@
         SELECT * FROM  demo101.user  WHERE id=#{value}
     </select>
 
+    <select id="login" parameterType="com.svc.org.po.User" resultType="com.svc.org.po.User">
+        SELECT * FROM  demo101.user  WHERE demo101.user.username=#{username} and demo101.user.password=#{password};
+    </select>
+
     <!-- 根据用户名称模糊查询用户信息，可能返回多条
 	resultType：指定就是单条记录所映射的java对象类型
 	${}:表示拼接sql串，将接收到参数的内容不加任何修饰拼接在sql中。

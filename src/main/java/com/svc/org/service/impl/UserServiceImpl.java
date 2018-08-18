@@ -18,6 +18,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.findUserById(userId);
     }
 
+    public User login(User user) throws Exception {
+        return userMapper.login(user);
+    }
+
     public List<UserCustom> findUserList(UserQueryVo userQueryVo) throws Exception {
         return userMapper.findUserList(userQueryVo);
     }

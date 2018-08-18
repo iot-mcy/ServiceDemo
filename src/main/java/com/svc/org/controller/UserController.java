@@ -8,8 +8,6 @@ import com.svc.org.service.UserService;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -96,6 +94,25 @@ public class UserController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/login")
+    public ResponseEntity<User> login(@RequestBody User u) throws Exception {
+        User user = null;
+        user = userService.login(u);
+        ResponseEntity<User> responseEntity = new ResponseEntity<User>();
+        if (user == null) {
+            responseEntity.setStatus(-1);
+            responseEntity.setMsg("失败");
+//            responseEntity.setData("");
+//            throw new CustomException("找不到相关数据");
+        } else {
+            responseEntity.setStatus(0);
+            responseEntity.setMsg("成功");
+            responseEntity.setData(user);
+        }
+        return responseEntity;
+    }
+
+    @ResponseBody
     @RequestMapping("/image/uploadImg")
     public ResponseEntity editItemsSubmit(
             Model model,
@@ -141,7 +158,7 @@ public class UserController {
      * @throws Exception
      */
     @ResponseBody
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadAttachment", method = RequestMethod.POST)
     public ResponseEntity<String> upload(HttpServletRequest request,
                                          @RequestParam("file") MultipartFile file) throws Exception {
 
@@ -183,7 +200,7 @@ public class UserController {
      * @throws Exception
      */
     @ResponseBody
-    @RequestMapping(value = "/uploadList", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadAttachments", method = RequestMethod.POST)
     public ResponseEntity<String> uploadList(HttpServletRequest request,
                                              @RequestParam("file") MultipartFile[] multipartFiles) throws Exception {
         //上传文件会自动绑定到MultipartFile中
@@ -214,20 +231,21 @@ public class UserController {
         return responseEntity;
     }
 
-    @RequestMapping(value = "/download/{filename}")
+    @RequestMapping(value = "/downloadAttachment/{path}")
     public byte[] download(HttpServletRequest request,
-                                           @PathVariable("filename") String filename,
-                                           Model model) throws Exception {
+                           @PathVariable("path") String path,
+                           Model model) throws Exception {
         //下载文件路径
-        String path = request.getServletContext().getRealPath("/images/");
-        File file = new File(path + File.separator + filename);
-        HttpHeaders headers = new HttpHeaders();
-        //下载显示的文件名，解决中文名称乱码问题
-        String downloadFileName = new String(filename.getBytes("UTF-8"), "iso-8859-1");
-        //通知浏览器以attachment（下载方式）打开图片
-        headers.setContentDispositionFormData("attachment", downloadFileName);
-        //application/octet-stream ： 二进制流数据（最常见的文件下载）。
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        String path1 = request.getServletContext().getRealPath("/images/");
+        File file = new File(path1 + File.separator + path);
+
+//        HttpHeaders headers = new HttpHeaders();
+//        //下载显示的文件名，解决中文名称乱码问题
+//        String downloadFileName = new String(filename.getBytes("UTF-8"), "iso-8859-1");
+//        //通知浏览器以attachment（下载方式）打开图片
+//        headers.setContentDispositionFormData("attachment", downloadFileName);
+//        //application/octet-stream ： 二进制流数据（最常见的文件下载）。
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
 //        ResponseEntity<byte[]> responseEntity = new ResponseEntity<byte[]>();
 //        responseEntity.setData(FileUtils.readFileToByteArray(file));
