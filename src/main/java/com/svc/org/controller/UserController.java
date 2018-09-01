@@ -1,23 +1,33 @@
 package com.svc.org.controller;
 
+import com.svc.org.authorization.IgnoreSecurity;
 import com.svc.org.bean.ResponseEntity;
 import com.svc.org.po.User;
 import com.svc.org.po.UserCustom;
 import com.svc.org.po.UserQueryVo;
+import com.svc.org.service.TokenManager;
 import com.svc.org.service.UserService;
+import com.svc.org.utils.Constants;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.svc.org.utils.Constants.*;
 
 
 @RestController
@@ -27,10 +37,12 @@ public class UserController {
     /**
      * Log4j日志处理(@author: rico)
      */
-    private static final Logger log = Logger.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenManager tokenManager;
 
     @ResponseBody
     @RequestMapping(value = "/login/{UserID}", method = RequestMethod.GET)
@@ -95,21 +107,61 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/login")
-    public ResponseEntity<User> login(@RequestBody User u) throws Exception {
+    @IgnoreSecurity
+    public ResponseEntity<Object> login(@RequestBody @Valid User u, BindingResult br, HttpServletResponse response) throws Exception {
+
+        ResponseEntity<Object> responseEntity = new ResponseEntity<Object>();
         User user = null;
+
+        if (br.hasErrors()) {
+            List<FieldError> list = br.getFieldErrors();
+            for (FieldError fieldError : list) {
+                System.out.println("属性名" + fieldError.getField() + ">>>" + fieldError.getDefaultMessage());
+                if (fieldError.getField().equals("username")) {
+                    responseEntity.setStatus(ERROR_CODE);
+                    responseEntity.setMsg(fieldError.getDefaultMessage());
+                    responseEntity.setData(user);
+
+                } else if (fieldError.getField().equals("password")) {
+                    responseEntity.setStatus(ERROR_CODE);
+                    responseEntity.setMsg(fieldError.getDefaultMessage());
+                    responseEntity.setData(user);
+                }
+                return responseEntity;
+            }
+
+        }
+
         user = userService.login(u);
-        ResponseEntity<User> responseEntity = new ResponseEntity<User>();
+
         if (user == null) {
-            responseEntity.setStatus(-1);
-            responseEntity.setMsg("失败");
-//            responseEntity.setData("");
-//            throw new CustomException("找不到相关数据");
+            responseEntity.setStatus(ERROR_CODE);
+            responseEntity.setMsg("用户名或者密码错误");
+            responseEntity.setData(user);
+//            throw new Exception("找不到相关数据");
         } else {
-            responseEntity.setStatus(0);
-            responseEntity.setMsg("成功");
+            String token = tokenManager.createToken(user.getUsername());
+            Cookie cookie = new Cookie(Constants.DEFAULT_TOKEN_NAME, token);
+            response.addCookie(cookie);
+
+            responseEntity.setStatus(SUCCESS_CODE);
+            responseEntity.setMsg(SUCCESS_STR);
+            user.setToken(token);
             responseEntity.setData(user);
         }
         return responseEntity;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/logout")
+    public ResponseEntity logout(HttpServletRequest request) throws Exception {
+        String token = request.getHeader(Constants.DEFAULT_TOKEN_NAME);
+        tokenManager.deleteToken(token);
+
+        ResponseEntity entity = new ResponseEntity();
+        entity.setStatus(0);
+        entity.setMsg("deleteToken");
+        return entity;
     }
 
     @ResponseBody
@@ -213,7 +265,7 @@ public class UserController {
                 String path = request.getServletContext().getRealPath("/images/");
                 //上传文件名
                 String filename = multipartFile.getOriginalFilename();
-                json.append(filename + ";");
+                json.append(path + filename + ";");
                 File filepath = new File(path, filename);
                 //判断路径是否存在，如果不存在就创建一个
                 if (!filepath.getParentFile().exists()) {

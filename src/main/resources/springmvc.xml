@@ -2,13 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- 启用注解扫描，并定义组件查找规则 ，mvc层只负责扫描@Controller、@ControllerAdvice -->
     <!-- base-package 如果多个，用“,”分隔 -->
@@ -21,12 +21,15 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <mvc:annotation-driven>
-        <mvc:message-converters>
-            <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
-            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+    <!-- 支持Controller的AOP代理 -->
+    <aop:aspectj-autoproxy/>
+
+    <!--<mvc:annotation-driven>-->
+    <!--<mvc:message-converters>-->
+    <!--<bean class="org.springframework.http.converter.StringHttpMessageConverter"/>-->
+    <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>-->
+    <!--</mvc:message-converters>-->
+    <!--</mvc:annotation-driven>-->
 
     <!--<bean class="com.svc.org.exception.CustomExceptionResolver"/>-->
 
@@ -43,4 +46,20 @@
     <!-- 使用默认的Servlet来响应静态文件 -->
     <mvc:default-servlet-handler/>
 
+    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+
+    <!--<mvc:annotation-driven validator="validator"/>-->
+    <!--<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">-->
+    <!--<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>-->
+    <!--<property name="validationMessageSource" ref="messageSource"/>-->
+    <!--</bean>-->
+    <!--&lt;!&ndash; 校验错误信息配置文件 &ndash;&gt;-->
+    <!--<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">-->
+    <!--&lt;!&ndash; 资源文件名 &ndash;&gt;-->
+    <!--&lt;!&ndash;<property name="basename" value="classpath:validationMessages"/>&ndash;&gt;-->
+    <!--&lt;!&ndash; 对资源文件内容缓存时间，单位秒 &ndash;&gt;-->
+    <!--<property name="fileEncodings" value="GBK"/>-->
+    <!--<property name="defaultEncoding" value="GBK"/>-->
+    <!--<property name="cacheSeconds" value="120"/>-->
+    <!--</bean>-->
 </beans>

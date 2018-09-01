@@ -8,6 +8,12 @@ public class ResponseEntity<T> {
     public ResponseEntity() {
     }
 
+    public ResponseEntity(int status, T data, String msg) {
+        this.status = status;
+        this.data = data;
+        this.msg = msg;
+    }
+
     public int getStatus() {
         return status;
     }
