@@ -1,0 +1,28 @@
+package com.svc.org.utils;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+
+
+/**
+ * Title: Web上下文工具类
+ *
+ * @author rico
+ * @created 2017年7月4日 下午5:16:42
+ */
+public class WebContextUtil {
+
+    /**
+     * @return
+     * @description 获取HTTP请求
+     * @author rico
+     * @created 2017年7月4日 下午5:18:08
+     */
+    public static HttpServletRequest getRequest() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes()).getRequest();
+        return request;
+    }
+}
