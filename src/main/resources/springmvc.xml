@@ -48,18 +48,4 @@
 
     <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
 
-    <!--<mvc:annotation-driven validator="validator"/>-->
-    <!--<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">-->
-    <!--<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>-->
-    <!--<property name="validationMessageSource" ref="messageSource"/>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash; 校验错误信息配置文件 &ndash;&gt;-->
-    <!--<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">-->
-    <!--&lt;!&ndash; 资源文件名 &ndash;&gt;-->
-    <!--&lt;!&ndash;<property name="basename" value="classpath:validationMessages"/>&ndash;&gt;-->
-    <!--&lt;!&ndash; 对资源文件内容缓存时间，单位秒 &ndash;&gt;-->
-    <!--<property name="fileEncodings" value="GBK"/>-->
-    <!--<property name="defaultEncoding" value="GBK"/>-->
-    <!--<property name="cacheSeconds" value="120"/>-->
-    <!--</bean>-->
 </beans>

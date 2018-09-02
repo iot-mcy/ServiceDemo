@@ -106,7 +106,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     @IgnoreSecurity
     public ResponseEntity<Object> login(@RequestBody @Valid User u, BindingResult br, HttpServletResponse response) throws Exception {
 
@@ -153,7 +153,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/logout")
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ResponseEntity logout(HttpServletRequest request) throws Exception {
         String token = request.getHeader(Constants.DEFAULT_TOKEN_NAME);
         tokenManager.deleteToken(token);

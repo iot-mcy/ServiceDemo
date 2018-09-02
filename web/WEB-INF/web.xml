@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
+    <listener>
+        <listener-class>
+            org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+
     <!-- 指定Spring 实体类（Bean）的配置文件所在目录,默认配置在WEB-INF目录下，这里我们resources里面的，管理更方便-->
     <context-param>
         <param-name>contextConfigLocation</param-name>
@@ -50,13 +56,39 @@
             <param-name>encoding</param-name>
             <param-value>utf-8</param-value>
         </init-param>
-        <!--<init-param>-->
-            <!--<param-name>allowHeaders</param-name>-->
-            <!--<param-value>Content-Type,Token</param-value>-->
-        <!--</init-param>-->
     </filter>
     <filter-mapping>
         <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 通过CORS技术实现AJAX跨域访问 -->
+    <filter>
+        <filter-name>corsFilter</filter-name>
+        <filter-class>com.svc.org.cors.CorsFilter</filter-class>
+        <!--允许访问的客户端域名-->
+        <init-param>
+            <param-name>allowOrigin</param-name>
+            <param-value>http://localhost:8080</param-value>
+        </init-param>
+        <!--允许访问的方法名，多个方法名用逗号分割-->
+        <init-param>
+            <param-name>allowMethods</param-name>
+            <param-value>GET,POST,PUT,DELETE,OPTIONS</param-value>
+        </init-param>
+        <!--是否允许请求带有验证信息，若要获取客户端域下的cookie时，需要将其设置为true-->
+        <init-param>
+            <param-name>allowCredentials</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <!--允许服务端访问的客户端请求头，多个请求头用逗号分割，例如：Content-Type-->
+        <init-param>
+            <param-name>allowHeaders</param-name>
+            <param-value>Content-Type,X-Token</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>corsFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
