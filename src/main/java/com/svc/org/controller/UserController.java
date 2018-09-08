@@ -17,10 +17,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.File;
 import java.util.ArrayList;
@@ -108,7 +110,11 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @IgnoreSecurity
-    public ResponseEntity<Object> login(@RequestBody @Valid User u, BindingResult br, HttpServletResponse response) throws Exception {
+    public ResponseEntity<Object> login(@RequestBody @Valid User u,
+                                        BindingResult br,
+                                        HttpServletResponse response,
+                                        HttpSession session,
+                                        HttpServletRequest request) throws Exception {
 
         ResponseEntity<Object> responseEntity = new ResponseEntity<Object>();
         User user = null;
@@ -154,7 +160,8 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity logout(HttpServletRequest request) throws Exception {
+    public ResponseEntity logout(HttpServletRequest request, HttpSession session) throws Exception {
+        User user = (User) request.getSession().getAttribute("login");
         String token = request.getHeader(Constants.DEFAULT_TOKEN_NAME);
         tokenManager.deleteToken(token);
 

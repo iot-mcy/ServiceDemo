@@ -58,38 +58,26 @@
     <bean id="userService" class="com.svc.org.service.impl.UserServiceImpl"/>
     <bean id="tokenManager" class="com.svc.org.service.impl.DefaultTokenManager"/>
 
-    <!-- 事务管理器
-        对mybatis操作数据库事务控制，spring使用jdbc的事务控制类
-    -->
+    <!-- 事务管理器对mybatis操作数据库事务控制，spring使用jdbc的事务控制类 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <!-- 数据源
-        dataSource在applicationContext-dao.xml中配置了
-         -->
+        <!-- 数据源  dataSource在applicationContext-dao.xml中配置了 -->
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <!-- 启用支持annotation注解方式事务管理 -->
-    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!-- 通知 -->
-    <tx:advice id="txAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <!-- 传播行为 -->
-            <tx:method name="save*" propagation="REQUIRED"/>
-            <tx:method name="delete*" propagation="REQUIRED"/>
-            <tx:method name="insert*" propagation="REQUIRED"/>
-            <tx:method name="update*" propagation="REQUIRED"/>
-            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
-            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
-            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
-        </tx:attributes>
-    </tx:advice>
-    <!-- aop -->
-    <aop:config>
-        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.svc.org.service.impl.*.*(..))"/>
-    </aop:config>
+    <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+    <!--</tx:advice>-->
 
-    <bean id="securityAspect" class="com.svc.org.exception.SecurityAspect">
+    <!-- aop -->
+    <!--<aop:config>-->
+        <!--<aop:advisor advice-ref="txAdvice" pointcut="execution(* com.svc.org.service.impl.*.*(..))"/>-->
+    <!--</aop:config>-->
+
+    <!--*****************************************token验证****************************************************-->
+    <bean id="securityAspect" class="com.svc.org.authorization.SecurityAspect">
         <property name="tokenManager" ref="tokenManager"/>
         <!--<property name="tokenName" value="X-Token"/>-->
     </bean>
@@ -100,6 +88,7 @@
                         pointcut="@annotation(org.springframework.web.bind.annotation.RequestMapping)"/>
         </aop:aspect>
     </aop:config>
+    <!--*****************************************token验证****************************************************-->
 
     <!-- springMVC上传文件时，需要配置MultipartResolver处理器 -->
     <bean id="multipartResolver"

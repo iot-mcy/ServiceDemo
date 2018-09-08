@@ -3,6 +3,7 @@ package com.svc.org.service.impl;
 import com.svc.org.authorization.CodecUtil;
 import com.svc.org.service.TokenManager;
 import com.svc.org.utils.StringUtil;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author rico
  * @created 2017年7月4日 下午4:41:32
  */
+
+@Transactional
 public class DefaultTokenManager implements TokenManager {
 
     /**

@@ -1,6 +1,6 @@
-package com.svc.org.exception;
+package com.svc.org.authorization;
 
-import com.svc.org.authorization.IgnoreSecurity;
+import com.svc.org.exception.TokenException;
 import com.svc.org.service.TokenManager;
 import com.svc.org.utils.Constants;
 import com.svc.org.utils.WebContextUtil;

@@ -18,6 +18,11 @@ import javax.validation.ValidationException;
 import static com.svc.org.utils.Constants.ERROR_CODE;
 import static com.svc.org.utils.Constants.ERROR_STR;
 
+/**
+ * 作者 mcy
+ * 日期 2018/9/8 16:48
+ * 各个异常事件
+ */
 @ControllerAdvice
 @ResponseBody
 public class ExceptionAspect {

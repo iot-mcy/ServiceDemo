@@ -31,8 +31,10 @@
     <!--</mvc:message-converters>-->
     <!--</mvc:annotation-driven>-->
 
+    <!--全局异常处理，目前不用-->
     <!--<bean class="com.svc.org.exception.CustomExceptionResolver"/>-->
 
+    <!--**************************************************************************************************-->
     <!--&lt;!&ndash; 注解的映射器 &ndash;&gt;-->
     <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>-->
 
@@ -42,10 +44,21 @@
     <!-- 会自动注册RequestMappingHandlerMapping与RequestMappingHandlerAdapter两个Bean，
 		这是SpringMVC为@Controllers分发请求所必需的，并提供了数据绑定支持、@NumberFormatAnnotation支持、 @DateTimeFormat支持、@Valid支持、读写XML的支持和读写JSON的支持等功能。 -->
     <mvc:annotation-driven/>
+    <!--**************************************************************************************************-->
 
     <!-- 使用默认的Servlet来响应静态文件 -->
     <mvc:default-servlet-handler/>
 
     <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+
+    <!-- 拦截器： 这里目的是进行登录验证，现在暂时不用这种方案-->
+    <!--<mvc:interceptors>-->
+    <!--&lt;!&ndash; 多个拦截器，顺序执行 &ndash;&gt;-->
+    <!--<mvc:interceptor>-->
+    <!--<mvc:mapping path="/**" />-->
+    <!--&lt;!&ndash; 登陆权限拦截器 &ndash;&gt;-->
+    <!--<bean class="com.svc.org.authorization.LoginInterceptor"></bean>-->
+    <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
 
 </beans>
