@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -161,7 +160,6 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ResponseEntity logout(HttpServletRequest request, HttpSession session) throws Exception {
-        User user = (User) request.getSession().getAttribute("login");
         String token = request.getHeader(Constants.DEFAULT_TOKEN_NAME);
         tokenManager.deleteToken(token);
 

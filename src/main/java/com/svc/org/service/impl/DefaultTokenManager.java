@@ -1,6 +1,7 @@
 package com.svc.org.service.impl;
 
 import com.svc.org.authorization.CodecUtil;
+import com.svc.org.authorization.TokenInfo;
 import com.svc.org.service.TokenManager;
 import com.svc.org.utils.StringUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,54 +9,67 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.svc.org.utils.Constants.TOKEN_EXPIRES_HOUR;
+
 
 /**
- * Title: TokenManager的默认实现
- * Description: 管理 Token
- *
- * @author rico
- * @created 2017年7月4日 下午4:41:32
+ * 作者 mcy
+ * 日期 2018/9/8 17:49
+ * token 管理
  */
-
 @Transactional
 public class DefaultTokenManager implements TokenManager {
 
     /**
-     * 将token存储到JVM内存(ConcurrentHashMap)中   (@author: rico)
+     * 将token存储到JVM内存(ConcurrentHashMap)中
      */
-    private static Map<String, String> tokenMap = new ConcurrentHashMap<String, String>();
+    private static Map<String, TokenInfo> tokenMap = new ConcurrentHashMap<String, TokenInfo>();
 
     /**
+     * 利用UUID创建Token(用户登录时 ， 创建Token)
+     *
      * @param username
      * @return
-     * @description 利用UUID创建Token(用户登录时 ， 创建Token)
-     * @author rico
-     * @created 2017年7月4日 下午4:46:46
      */
     public String createToken(String username) {
         String token = CodecUtil.createUUID();
-        tokenMap.put(token, username);
+        TokenInfo tokenInfo = new TokenInfo();
+        tokenInfo.setUsername(username);
+        tokenInfo.setTime(System.currentTimeMillis());
+        tokenMap.put(token, tokenInfo);
         return token;
     }
 
-
     /**
+     * Token验证(用户登录验证)
+     *
      * @param token
      * @return
-     * @description Token验证(用户登录验证)
-     * @author rico
-     * @created 2017年7月4日 下午4:46:50
      */
     public boolean checkToken(String token) {
-        return !StringUtil.isEmpty(token) && tokenMap.containsKey(token);
+        if (StringUtil.isNotEmpty(token)) {
+            if (tokenMap.containsKey(token)) {
+                TokenInfo tokenInfo = tokenMap.get(token);
+                long currentTime = System.currentTimeMillis();
+                long l = currentTime - tokenInfo.getTime();
+                int hour = (int) (l / (60 * 60 * 1000));
+                if (hour > TOKEN_EXPIRES_HOUR) {
+                    return false;
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
 
     /**
+     * Token删除(用户登出时 ， 删除Token)
+     *
      * @param token
-     * @description Token删除(用户登出时 ， 删除Token)
-     * @author rico
-     * @created 2017年7月4日 下午4:46:54
      */
     public void deleteToken(String token) {
         // TODO Auto-generated method stub
